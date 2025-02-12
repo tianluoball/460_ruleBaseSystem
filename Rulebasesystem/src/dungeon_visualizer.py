@@ -12,6 +12,12 @@ class DungeonVisualizer:
             'treasure': '#FFD700',   # Gold
             'monster': '#7B1FA2'     # Purple
         }
+        self.labels = {
+            'entrance': 'S',  # Start
+            'exit': 'X',      # eXit
+            'treasure': 'T',
+            'monster': 'M'
+        }
         self.connection_color = '#616161'
         
     def _normalize_coordinates(self, rooms: Dict[Tuple[int, int], Room]) -> Tuple[Dict[Tuple[int, int], Room], int, int]:
@@ -83,9 +89,10 @@ class DungeonVisualizer:
             dwg.add(circle)
             
             # Room type label
+            # Room type label
             if room.type != 'normal':
                 text = dwg.text(
-                    room.type[0].upper(),
+                    self.labels[room.type],
                     insert=(center_x, center_y),
                     font_size=self.cell_size // 4,
                     font_family='Arial',
@@ -93,6 +100,8 @@ class DungeonVisualizer:
                     text_anchor='middle',
                     dominant_baseline='middle'
                 )
+                # 添加 pointer-events="none" 属性
+                text.update({'pointer-events': 'none'})
                 dwg.add(text)
         
         if return_normalized:

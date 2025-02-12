@@ -3,8 +3,10 @@ import { useState } from 'react';
 const DungeonGenerator = () => {
   const [svgContent, setSvgContent] = useState('');
   const [descriptions, setDescriptions] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState(false);
+  const [overview, setOverview] = useState('');
+  const [theme, setTheme] = useState('');
   const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const generateDungeon = async () => {
     setLoading(true);
@@ -30,30 +32,6 @@ const DungeonGenerator = () => {
       console.error('详细错误信息:', error);
     } finally {
       setLoading(false);
-    }
-  };
-  
-  const handleRoomClick = (e: React.MouseEvent) => {
-    const circle = (e.target as Element).closest('circle');
-    if (circle) {
-      const cx = circle.getAttribute('cx');
-      const cy = circle.getAttribute('cy');
-      if (cx && cy) {
-        // 从圆形的中心坐标计算房间坐标
-        const cell_size = 50; // 这需要与后端的 cell_size 匹配
-        const x = Math.round((parseFloat(cx) / cell_size) - 0.5);
-        const y = Math.round((parseFloat(cy) / cell_size) - 0.5);
-        const key = `${x},${y}`;
-        
-        console.log("Clicked coordinates:", key); // 调试用
-        
-        if (descriptions[key]) {
-          setSelectedRoom(key);
-        } else {
-          console.log("No description found for coordinates:", key); // 调试用
-          setSelectedRoom(null);
-        }
-      }
     }
   };
 
@@ -83,12 +61,25 @@ const DungeonGenerator = () => {
             {loading ? 'Generating...' : 'Generate Dungeon'}
           </button>
           
+          {overview && (
+            <div style={{ 
+              marginTop: '20px',
+              padding: '15px',
+              backgroundColor: '#f8f9fa',
+              borderRadius: '4px',
+              textAlign: 'left',
+              whiteSpace: 'pre-line'
+            }}>
+              {overview}
+            </div>
+          )}
+          
           <div style={{ 
             display: 'flex',
             gap: '20px',
             marginTop: '20px'
           }}>
-            {/* 地图区域 */}
+            {/* Map Area */}
             <div style={{ 
               flex: '1',
               backgroundColor: '#f8f9fa',
@@ -102,15 +93,27 @@ const DungeonGenerator = () => {
               {svgContent ? (
                 <div 
                   dangerouslySetInnerHTML={{ __html: svgContent }}
-                  onClick={handleRoomClick}
+                  onClick={(e) => {
+                    const circle = (e.target as Element).closest('circle');
+                    if (circle) {
+                      const cx = circle.getAttribute('cx');
+                      const cy = circle.getAttribute('cy');
+                      if (cx && cy) {
+                        const x = Math.round((parseFloat(cx) / 50) - 0.5);
+                        const y = Math.round((parseFloat(cy) / 50) - 0.5);
+                        const key = `${x},${y}`;
+                        setSelectedRoom(key);
+                      }
+                    }
+                  }}
                   style={{ cursor: 'pointer' }}
                 />
               ) : (
-                <p style={{ color: '#666' }}>Click the button to generate a dungeon</p>
+                <p style={{ color: '#666' }}>Click the Generate button to create a dungeon</p>
               )}
             </div>
 
-            {/* 描述区域 */}
+            {/* Description Area */}
             <div style={{
               flex: '1',
               backgroundColor: '#f8f9fa',
@@ -122,8 +125,11 @@ const DungeonGenerator = () => {
               gap: '10px'
             }}>
               <h3>Room Description</h3>
+              {theme && <p style={{ color: '#666' }}>Theme: {theme}</p>}
               {selectedRoom ? (
-                <p>{descriptions[selectedRoom] || 'No description available for this room'}</p>
+                <p style={{ fontSize: '16px', lineHeight: '1.6' }}>
+                  {descriptions[selectedRoom] || 'Select a room to view its description'}
+                </p>
               ) : (
                 <p style={{ color: '#666' }}>Click on a room to view its description</p>
               )}
