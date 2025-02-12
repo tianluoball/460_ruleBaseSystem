@@ -26,7 +26,7 @@ async def generate_dungeon():
         # 生成地下城
         generator = DungeonLSystem()
         dungeon = generator.generate(iterations=3)
-        
+        entrance_pos = (0, 0)
         # 生成描述
         grammar = DungeonGrammar()
         
@@ -37,7 +37,12 @@ async def generate_dungeon():
         # 为规范化后的坐标生成描述
         descriptions_dict = {}
         for (x, y), room in normalized_rooms.items():
-            descriptions_dict[f"{x},{y}"] = grammar.generate_room_description(room.type)
+            descriptions_dict[f"{x},{y}"] = grammar.generate_room_description(
+                room_type=room.type,
+                pos=(x, y),  # 房间位置
+                entrance_pos=entrance_pos,  # 入口位置
+                rooms=normalized_rooms  # 所有房间信息
+            )
         
         print("Generated coordinates:", list(descriptions_dict.keys()))  # 调试用
         
