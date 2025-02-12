@@ -13,7 +13,7 @@ const DungeonGenerator = () => {
     setSelectedRoom(null);
     
     try {
-      const response = await fetch('https://four60-rulebasesystem.onrender.com');
+      const response = await fetch('https://four60-rulebasesystem.onrender.com/api/generate-dungeon');
       const data = await response.json();
       setSvgContent(data.svg);
       setDescriptions(data.descriptions);
