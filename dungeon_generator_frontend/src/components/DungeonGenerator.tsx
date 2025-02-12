@@ -8,20 +8,29 @@ const DungeonGenerator = () => {
 
   const generateDungeon = async () => {
     setLoading(true);
-    // 清除之前的描述和选中状态
     setDescriptions({});
     setSelectedRoom(null);
     
     try {
+      console.log('开始请求API...');
       const response = await fetch('https://four60-rulebasesystem.onrender.com/api/generate-dungeon');
+      console.log('收到响应:', response);
+      
       const data = await response.json();
+      console.log('解析后的数据:', data);
+      
+      console.log('Setting SVG content...');
       setSvgContent(data.svg);
+      console.log('SVG content set!');
+      
+      console.log('Setting descriptions...');
       setDescriptions(data.descriptions);
-      console.log("Available descriptions:", Object.keys(data.descriptions)); // 调试用
+      console.log('Descriptions set!');
     } catch (error) {
-      console.error('Error generating dungeon:', error);
+      console.error('详细错误信息:', error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
   
   const handleRoomClick = (e: React.MouseEvent) => {
