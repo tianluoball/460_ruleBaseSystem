@@ -246,11 +246,30 @@ Legend speaks of {self.story_state['main_treasure']} hidden within these halls..
         
         # Add theme-specific content for special rooms
         if room_type == 'monster':
-            monster = random.choice(room_rules['monster_type'][self.current_theme])
-            full_desc = f"{description} {distance_desc}. {details} {monster} lurks within."
+            print(f"Current theme: {self.current_theme}, Type: {type(self.current_theme)}")
+            print(f"Monster type keys: {room_rules['monster_type'].keys()}")
+            
+            if 'monster_type' not in room_rules:
+                print(f"Error: 'monster_type' not found in room_rules for room type {room_type}")
+                return f"{description} {distance_desc}. {details} A mysterious creature lurks within."
+            
+            try:
+                monster_list = room_rules['monster_type'][self.current_theme]
+                if not monster_list:
+                    print(f"Warning: monster_type list is empty for theme {self.current_theme}")
+                    monster = "a mysterious creature"
+                else:
+                    monster = random.choice(monster_list)
+                full_desc = f"{description} {distance_desc}. {details} {monster} lurks within."
+            except KeyError:
+                print(f"KeyError: {self.current_theme} not found in monster_type")
+                full_desc = f"{description} {distance_desc}. {details} A mysterious creature lurks within."
         elif room_type == 'treasure':
-            treasure = random.choice(room_rules['treasure_type'][self.current_theme])
-            full_desc = f"{description} {distance_desc}. {details} In the center, {treasure} draws your attention."
+            try:
+                treasure = random.choice(room_rules['treasure_type'][self.current_theme])
+                full_desc = f"{description} {distance_desc}. {details} In the center, {treasure} draws your attention."
+            except (KeyError, IndexError):
+                full_desc = f"{description} {distance_desc}. {details} In the center, something valuable catches your eye."
         else:
             full_desc = f"{description} {distance_desc}. {details}"
         
