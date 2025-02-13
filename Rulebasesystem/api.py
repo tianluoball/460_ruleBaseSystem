@@ -2,10 +2,10 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from fastapi import FastAPI, Response
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-import json
+import traceback
 from src.dungeon_lsystem import DungeonLSystem
 from src.dungeon_visualizer import DungeonVisualizer
 from src.dungeon_grammar import DungeonGrammar
@@ -23,39 +23,46 @@ app.add_middleware(
 @app.get("/api/generate-dungeon")
 async def generate_dungeon():
     try:
-        # 生成地下城
-        generator = DungeonLSystem()
-        dungeon = generator.generate(iterations=3)
-        entrance_pos = (0, 0)
-        # 生成描述
+        # 初始化语法生成器（为每个新地下城生成新的主题和故事）
         grammar = DungeonGrammar()
         
-        # 创建可视化并获取规范化的房间坐标
-        visualizer = DungeonVisualizer(cell_size=50)
-        svg_content, normalized_rooms = visualizer.create_svg(dungeon, return_string=True, return_normalized=True)
+        # 生成地下城布局
+        generator = DungeonLSystem()
+        dungeon = generator.generate(iterations=3)
         
-        # 为规范化后的坐标生成描述
-        descriptions_dict = {}
-        for (x, y), room in normalized_rooms.items():
-            descriptions_dict[f"{x},{y}"] = grammar.generate_room_description(
-                room_type=room.type,
-                pos=(x, y),  # 房间位置
-                entrance_pos=entrance_pos,  # 入口位置
-                rooms=normalized_rooms  # 所有房间信息
+        # 获取地下城整体描述
+        overview = grammar.generate_dungeon_overview()
+        
+        # 获取入口位置
+        entrance_pos = next((pos for pos, room in dungeon.items() if room.type == 'entrance'), (0, 0))
+        
+        # 生成所有房间的描述
+        descriptions = {
+            f"{pos[0]},{pos[1]}": grammar.generate_room_description(
+                room.type, 
+                pos, 
+                entrance_pos,
+                dungeon
             )
+            for pos, room in dungeon.items()
+        }
         
-        print("Generated coordinates:", list(descriptions_dict.keys()))  # 调试用
+        # 创建可视化
+        visualizer = DungeonVisualizer(cell_size=50)
+        svg_content = visualizer.create_svg(dungeon, return_string=True)
         
-        # 返回JSON响应
+        # 返回完整的响应
         return JSONResponse(content={
             "svg": svg_content,
-            "descriptions": descriptions_dict
+            "overview": overview,
+            "descriptions": descriptions,
+            "theme": grammar.current_theme.value,
+            "mainTreasure": grammar.story_state['main_treasure']
         })
         
     except Exception as e:
-        print("Error:", str(e))
-        import traceback
-        traceback.print_exc()
+        print("Error generating dungeon:", str(e))
+        print("Traceback:", traceback.format_exc())
         return JSONResponse(
             content={"error": str(e)},
             status_code=500
