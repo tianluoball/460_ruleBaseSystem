@@ -65,6 +65,34 @@ const DungeonGenerator = () => {
               {overview}
             </div>
           )}
+
+            {/* example */}
+          <div style={{
+            padding: '15px',
+            backgroundColor: '#f8f9fa',
+            borderRadius: '4px',
+            marginBottom: '20px'
+          }}>
+            <h3 style={{ marginBottom: '10px' }}>Room Types:</h3>
+            <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <div style={{ width: '20px', height: '20px', borderRadius: '50%', backgroundColor: '#4CAF50' }}></div>
+                <span>S - Entrance</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <div style={{ width: '20px', height: '20px', borderRadius: '50%', backgroundColor: '#7B1FA2' }}></div>
+                <span>M - Monster Room</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <div style={{ width: '20px', height: '20px', borderRadius: '50%', backgroundColor: '#FFD700' }}></div>
+                <span>T - Treasure Room</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <div style={{ width: '20px', height: '20px', borderRadius: '50%', backgroundColor: '#F44336' }}></div>
+                <span>X - Exit</span>
+              </div>
+            </div>
+          </div>
           
           <div style={{ 
             display: 'flex',
