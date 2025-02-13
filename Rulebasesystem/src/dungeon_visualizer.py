@@ -100,7 +100,7 @@ class DungeonVisualizer:
                     text_anchor='middle',
                     dominant_baseline='middle'
                 )
-                # 添加 pointer-events="none" 属性
+                # pointer-events="none" to go through text
                 text.update({'pointer-events': 'none'})
                 dwg.add(text)
         

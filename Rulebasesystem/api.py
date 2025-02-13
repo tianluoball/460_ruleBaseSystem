@@ -23,24 +23,24 @@ app.add_middleware(
 @app.get("/api/generate-dungeon")
 async def generate_dungeon():
     try:
-        # 初始化语法生成器（为每个新地下城生成新的主题和故事）
+        # initial grammar
         grammar = DungeonGrammar()
         
-        # 生成地下城布局
+        # generate maps using Lsystem
         generator = DungeonLSystem()
         dungeon = generator.generate(iterations=3)
         
-        # 获取地下城整体描述
+        # retrive overview description
         overview = grammar.generate_dungeon_overview()
         
-        # 创建可视化并获取归一化的房间布局
+        # get image and normalize location
         visualizer = DungeonVisualizer(cell_size=50)
         svg_content, normalized_rooms = visualizer.create_svg(dungeon, return_string=True, return_normalized=True)
         
-        # 获取归一化后的入口位置
+        # get normalized location
         entrance_pos = next((pos for pos, room in normalized_rooms.items() if room.type == 'entrance'), (0, 0))
         
-        # 使用归一化后的坐标生成描述
+        # description attached on normalized location
         descriptions = {
             f"{pos[0]},{pos[1]}": grammar.generate_room_description(
                 room.type, 
@@ -51,7 +51,7 @@ async def generate_dungeon():
             for pos, room in normalized_rooms.items()
         }
         
-        # 返回完整的响应
+        # return all
         return JSONResponse(content={
             "svg": svg_content,
             "overview": overview,

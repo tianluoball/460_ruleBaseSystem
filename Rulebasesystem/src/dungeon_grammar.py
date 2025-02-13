@@ -167,7 +167,7 @@ class DungeonGrammar:
         
         if room_type == 'monster':
             if not self.story_state['main_villain']:
-                # 修正这里：从正确的位置获取 monster_type
+                # get monster_type
                 monster_list = self.rules[room_type]['monster_type'][self.current_theme]
                 self.story_state['main_villain'] = random.choice(monster_list)
                 return f"Legends speak of {self.story_state['main_villain']} guarding {self.story_state['main_treasure']}"
@@ -254,7 +254,7 @@ Legend speaks of {self.story_state['main_treasure']} hidden within these halls..
                 return f"{description} {distance_desc}. {details} A mysterious creature lurks within."
             
             try:
-                # 确保使用正确的枚举类型
+                # double_check current_theme
                 current_theme = (
                     self.current_theme if isinstance(self.current_theme, DungeonTheme)
                     else DungeonTheme(self.current_theme)
