@@ -167,9 +167,9 @@ class DungeonGrammar:
         
         if room_type == 'monster':
             if not self.story_state['main_villain']:
-                self.story_state['main_villain'] = random.choice(
-                    self.rules['monster_type'][self.current_theme]
-                )
+                # 修正这里：从正确的位置获取 monster_type
+                monster_list = self.rules[room_type]['monster_type'][self.current_theme]
+                self.story_state['main_villain'] = random.choice(monster_list)
                 return f"Legends speak of {self.story_state['main_villain']} guarding {self.story_state['main_treasure']}"
         
         elif room_type == 'treasure':
@@ -254,15 +254,21 @@ Legend speaks of {self.story_state['main_treasure']} hidden within these halls..
                 return f"{description} {distance_desc}. {details} A mysterious creature lurks within."
             
             try:
-                monster_list = room_rules['monster_type'][self.current_theme]
+                # 确保使用正确的枚举类型
+                current_theme = (
+                    self.current_theme if isinstance(self.current_theme, DungeonTheme)
+                    else DungeonTheme(self.current_theme)
+                )
+                
+                monster_list = room_rules['monster_type'][current_theme]
                 if not monster_list:
-                    print(f"Warning: monster_type list is empty for theme {self.current_theme}")
+                    print(f"Warning: monster_type list is empty for theme {current_theme}")
                     monster = "a mysterious creature"
                 else:
                     monster = random.choice(monster_list)
                 full_desc = f"{description} {distance_desc}. {details} {monster} lurks within."
-            except KeyError:
-                print(f"KeyError: {self.current_theme} not found in monster_type")
+            except (KeyError, ValueError) as e:
+                print(f"Error accessing monster_type: {e}")
                 full_desc = f"{description} {distance_desc}. {details} A mysterious creature lurks within."
         elif room_type == 'treasure':
             try:
