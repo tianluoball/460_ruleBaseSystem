@@ -16,6 +16,7 @@ const DungeonGenerator = () => {
     try {
       const response = await fetch('https://four60-rulebasesystem.onrender.com/api/generate-dungeon');
       const data = await response.json();
+      console.log('Received descriptions:', data.descriptions);  // 调试用
       setSvgContent(data.svg);
       setDescriptions(data.descriptions);
       setOverview(data.overview);
@@ -90,13 +91,18 @@ const DungeonGenerator = () => {
                       const cx = circle.getAttribute('cx');
                       const cy = circle.getAttribute('cy');
                       if (cx && cy) {
-                        const x = Math.round((parseFloat(cx) / 50) - 0.5);
-                        const y = Math.round((parseFloat(cy) / 50) - 0.5);
+                        // 修改坐标计算方式
+                        const cell_size = 50;
+                        const x = Math.floor(parseFloat(cx) / cell_size - 0.5);
+                        const y = Math.floor(parseFloat(cy) / cell_size - 0.5);
                         const key = `${x},${y}`;
+                        console.log('Clicked coordinates:', key);  // 调试用
+                        console.log('Available descriptions:', Object.keys(descriptions));  // 调试用
                         setSelectedRoom(key);
                       }
                     }
-                  }}
+                  }
+                }
                   style={{ cursor: 'pointer' }}
                 />
               ) : (
